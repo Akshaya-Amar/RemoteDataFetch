@@ -11,6 +11,7 @@ lifecycleViewmodelKtx = "2.9.0"
 loggingInterceptor = "4.12.0"
 material = "1.12.0"
 navigationFragmentKtx = "2.9.0"
+pagingRuntimeKtx = "3.3.6"
 retrofitVersion = "2.11.0"
 kapt = "2.1.20"
 activity = "1.10.1"
@@ -33,7 +34,7 @@ hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt"
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-
+androidx-paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingRuntimeKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

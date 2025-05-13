@@ -1,8 +1,9 @@
 package com.amar.apidemomvvm.data.repository
 
-import com.amar.apidemomvvm.common.Result
+import androidx.paging.PagingData
 import com.amar.apidemomvvm.data.model.Post
+import kotlinx.coroutines.flow.Flow
 
 interface PostRepository {
-     suspend fun getPosts(): Result<List<Post>>
+     fun getPosts(): Flow<PagingData<Post>>
 }

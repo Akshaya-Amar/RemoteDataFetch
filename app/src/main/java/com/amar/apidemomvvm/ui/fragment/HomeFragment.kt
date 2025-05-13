@@ -8,15 +8,18 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.amar.apidemomvvm.common.Result
 import com.amar.apidemomvvm.data.model.Post
 import com.amar.apidemomvvm.databinding.FragmentHomeBinding
 import com.amar.apidemomvvm.ui.adapter.PostAdapter
 import com.amar.apidemomvvm.ui.viewmodel.PostViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -46,30 +49,41 @@ class HomeFragment : Fragment() {
                adapter = postAdapter
           }
 
-          lifecycleScope.launch {
-               Log.d("check...ddd", "onViewCreated: before")
-               delay(5000)
-               Log.d("check...ddd", "onViewCreated: after")
-               viewmodel.getNotes()
+          viewLifecycleOwner.lifecycleScope.launch {
+               repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    delay(4000)
+                    viewmodel.posts.collectLatest {
+                         postAdapter.submitData(it)
+                    }
+               }
           }
 
-          viewmodel.posts.observe(viewLifecycleOwner) { result ->
-               when (result) {
-                    is Result.Success -> {
-                         Log.d("check...", "onCreate: Success")
-                         val data = result.data
-                         postAdapter.submitList(data)
-                         data.forEach { post ->
-                              Log.d("check...", "onCreate: ${post.id}")
+          viewLifecycleOwner.lifecycleScope.launch {
+               repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    postAdapter.loadStateFlow.collectLatest { loadStates ->
+                         when (loadStates.refresh) {
+                              is LoadState.Loading -> {
+                                   Log.d("check...load state", "onViewCreated: loading")
+                                   binding.progressBar.visibility = View.VISIBLE
+                                   binding.recyclerView.visibility = View.GONE
+                              }
+
+                              is LoadState.NotLoading -> {
+                                   Log.d("check...load state", "onViewCreated: Success")
+                                   binding.recyclerView.visibility = View.VISIBLE
+                                   binding.progressBar.visibility = View.GONE
+                              }
+
+                              is LoadState.Error -> {
+                                   Log.d("check...load state", "onViewCreated: Error")
+                                   binding.recyclerView.visibility = View.GONE
+                                   binding.progressBar.visibility = View.GONE
+                                   val error = (loadStates.refresh as LoadState.Error).error
+                                   val errorMessage = error.message?.takeIf { it.isNotBlank() } ?: "Something went wrong"
+                                   Log.d("check...load state", "onViewCreated: Error $errorMessage")
+                                   Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+                              }
                          }
-                    }
-
-                    is Result.Failure -> {
-                         Log.d("check...", "onCreate: Failure -> ${result.message}")
-                    }
-
-                    Result.Loading -> {
-                         Log.d("check...", "onCreate: Loading")
                     }
                }
           }

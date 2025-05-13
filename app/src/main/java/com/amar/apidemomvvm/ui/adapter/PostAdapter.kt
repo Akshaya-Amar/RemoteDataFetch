@@ -2,15 +2,15 @@ package com.amar.apidemomvvm.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.amar.apidemomvvm.data.model.Post
 import com.amar.apidemomvvm.databinding.PostItemBinding
 
 class PostAdapter(
      private val onItemClick: (Post) -> Unit
-) : ListAdapter<Post, PostAdapter.PostViewHolder>(PostDiffCallback()) {
+) : PagingDataAdapter<Post, PostAdapter.PostViewHolder>(PostDiffCallback()) {
 
      class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
           override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
@@ -28,8 +28,9 @@ class PostAdapter(
      }
 
      override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-          val post = getItem(position)
-          holder.bind(post, onItemClick)
+          getItem(position)?.let { post ->
+               holder.bind(post, onItemClick)
+          }
      }
 
      class PostViewHolder(
