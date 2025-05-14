@@ -54,7 +54,7 @@ class HomeFragment : Fragment() {
 
           viewLifecycleOwner.lifecycleScope.launch {
                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    delay(4000)
+                    delay(2000)
                     viewmodel.posts.collectLatest {
                          postAdapter.submitData(it)
                     }
