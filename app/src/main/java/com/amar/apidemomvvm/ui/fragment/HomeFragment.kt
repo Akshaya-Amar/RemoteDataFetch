@@ -15,6 +15,7 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amar.apidemomvvm.data.model.Post
 import com.amar.apidemomvvm.databinding.FragmentHomeBinding
+import com.amar.apidemomvvm.ui.adapter.LoaderAdapter
 import com.amar.apidemomvvm.ui.adapter.PostAdapter
 import com.amar.apidemomvvm.ui.viewmodel.PostViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,7 +47,9 @@ class HomeFragment : Fragment() {
 
           binding.recyclerView.apply {
                layoutManager = LinearLayoutManager(requireContext())
-               adapter = postAdapter
+               adapter = postAdapter.withLoadStateFooter(
+                    footer = LoaderAdapter { postAdapter.retry() }
+               )
           }
 
           viewLifecycleOwner.lifecycleScope.launch {
